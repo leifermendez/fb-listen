@@ -3,3 +3,4 @@ cookies.json
 csv/
 !csv/.gitkeep
 userLog.json
+userReplay.json
