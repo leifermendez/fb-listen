@@ -4,3 +4,4 @@ csv/
 !csv/.gitkeep
 userLog.json
 userReplay.json
+log.json
