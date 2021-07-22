@@ -1,7 +1,7 @@
 module.exports = {
     url: 'https://m.facebook.com',
     puppeterConfig: {
-        headless: true,
+        headless: false,
         args: [
             '--no-sandbox',
             '--disable-setuid-sendbox',
@@ -10,10 +10,7 @@ module.exports = {
             '--disable-gpu',
         ],
     },
-    username: 'tecniserviciosleifer@gmail.com',
-    password: 'Token.0102',
-    useCookies: true,
-    cookiesFilePath: './cookies.json',
+    cookiesFilePath: './tmp/cookies.json',
     layout: {
         login_form: {
             email: 'input#m_login_email',

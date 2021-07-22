@@ -1,0 +1,176 @@
+const puppeteer = require('puppeteer')
+const loginMessenger = require("facebook-chat-api");
+const { puppeterConfig, layout, url } = require('../../config')
+const fs = require('fs')
+const { getAccount } = require('../controllers/accounts')
+const { registerLog } = require('../controllers/userLog')
+const { consoleMessage } = require('../helpers/console')
+
+const pathCookieAccount = `${__dirname}/../../tmp`
+
+var credentials, page, browser, userFb, ads;
+
+
+// Check ✔
+const init = async () => new Promise(async (resolve, reject) => {
+    userFb = await getAccount()
+    consoleMessage('Starting puppeter', 'blueBright')
+
+    const cookiFileAccount = `${pathCookieAccount}/${userFb._id}.json`
+    /** Check if existe cookies file */
+    browser = await puppeteer.launch(puppeterConfig);
+    const incognitoContext = await browser.createIncognitoBrowserContext();
+    page = await incognitoContext.newPage();
+    if (fs.existsSync(cookiFileAccount)) {
+        const cookiesString = fs.readFileSync(cookiFileAccount);
+        const cookies = JSON.parse(cookiesString.toString());
+        await page.setCookie(...cookies);
+        consoleMessage('Cookie  found ✔', 'green')
+        resolve(true)
+    } else {
+        const cookies = await page.cookies();
+        fs.writeFileSync(cookiFileAccount, JSON.stringify(cookies, null, 2));
+        consoleMessage(`Cookie ${userFb.email} file created ✔`, 'yellow')
+        resolve(true)
+    }
+
+})
+
+// Check ✔
+const login = async () => {
+    /**
+       * Cookie banner
+       */
+    const cookiFileAccount = `${pathCookieAccount}/${userFb._id}.json`
+    try {
+
+
+        consoleMessage(`Chek Login ${userFb.email}`, 'yellow')
+
+        const cookiesString = fs.readFileSync(cookiFileAccount, 'utf-8');
+        const cookiesParse = JSON.parse(cookiesString.toString())
+
+        if (fs.existsSync(cookiFileAccount) && cookiesParse.length) {
+            const cookieFix = cookiesParse.map(a => {
+                const key = a.name;
+                delete a.name;
+                return { ...a, ...{ key } }
+            });
+
+            credentials = {
+                appState: cookieFix
+            };
+            consoleMessage('Cookie valid', 'yellow')
+            return true
+        }
+    } catch (e) {
+        new Error('ERROR_UNDEFINED')
+    }
+
+
+    try {
+        consoleMessage('Starting new login', 'yellow')
+        await page.goto(url);
+        await page.waitForXPath('//a[@data-cookiebanner="accept_button"]');
+        const acceptCookiesButton = (await page.$x('//a[@data-cookiebanner="accept_button"]'))[0];
+        await page.evaluate((el) => {
+            el.focus();
+            el.click();
+        }, acceptCookiesButton);
+
+    } catch (e) {
+        new Error('ERROR_WAIT_BANNER_COOKIE')
+        console.log('Error esperando banner cookie');
+    }
+
+
+    /**
+     * Esperando por el boton de login
+     */
+
+    await page.waitForSelector(layout.login_form.parent);
+    // Focusing to the email input
+    await page.focus(layout.login_form.email);
+    // Clicking on the email form input to be able to type on input
+    await page.focus(layout.login_form.email);
+    // Typing on the email input the email address
+    await page.keyboard.type(userFb.email);
+    // Focusing on the password input
+    await page.focus(layout.login_form.password);
+    // Typing the facebook password on password input
+    await page.keyboard.type(userFb.password);
+    // Clicking on the submit button
+    await page.waitForXPath(`//button[@name="login"]`)
+    const [loginButton] = await page.$x(`//button[@name="login"]`);
+    await page.evaluate((el) => {
+        el.click();
+    }, loginButton);
+    const languageAccount = userFb.language || 'en'
+    const layoutLanguage = languageAccount === 'en' ? '//button[@value="OK"]' : '//button[@value="Aceptar"]'
+    await page.waitForXPath(layoutLanguage) // ✅
+    const [touchLoginButton] = await page.$x(layoutLanguage); // Si el FB esta en español "Aceptar"
+    await page.evaluate((el) => {
+        el.click();
+    }, touchLoginButton);
+
+    const cookies = await page.cookies();
+    fs.writeFileSync(cookiFileAccount, JSON.stringify(cookies, null, 2));
+    consoleMessage('New cookie valid', 'yellow')
+
+
+}
+
+// Check ✔
+const closeBrowser = () => browser.close()
+
+
+const generateCredentials = () => {
+
+    try {
+        const cookiFileAccount = `${pathCookieAccount}/${userFb._id}.json`
+        const cookiesString = fs.readFileSync(cookiFileAccount, 'utf-8');
+        const cookiesParse = JSON.parse(cookiesString.toString())
+
+        if (fs.existsSync(cookiFileAccount) && cookiesParse.length) {
+            const cookieFix = cookiesParse.map(a => {
+                const key = a.name;
+                delete a.name;
+                return { ...a, ...{ key } }
+            });
+
+            credentials = {
+                appState: cookieFix
+            };
+        }
+
+    } catch (e) {
+        console.log(e);
+    }
+
+}
+
+const singleSend = (body, userId, adsId) => {
+
+    try {
+        generateCredentials()
+        loginMessenger(credentials, (err, api) => {
+            if (err) return console.error(err);
+            console.log(body.fb_message, body.fb_uid);
+            api.sendMessage(body.fb_message, body.fb_uid, async (e, messageInfo) => {
+                if (e) {
+                    consoleMessage('Error en FB Messenger :(', 'red')
+                } else {
+                    await registerLog({ userId, adsId })
+                    consoleMessage(`Mensaje enviado! ${body.fb_uid}`, 'green')
+                }
+
+            });
+        });
+    } catch (e) {
+        console.log(e);
+        return e
+    }
+}
+
+
+module.exports = { init, login, closeBrowser, singleSend }
