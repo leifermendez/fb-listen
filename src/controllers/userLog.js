@@ -5,7 +5,7 @@ const { errorCatch } = require('../helpers/errorHandle')
 
 const registerLog = async (data) => {
     try {
-        await modelUserLog.create({ userId: data.userId, adsId: data.adsId })
+        await modelUserLog.create(data)
     } catch (e) {
         errorCatch(e)
     }
@@ -27,6 +27,41 @@ const checkLog = async (data) => {
     }
 }
 
+const findLog = async (idUser) => {
+    try {
+        const userFind = await modelUserLog.aggregate(
+            [
+
+                {
+                    $sort: { createdAt: 1 }
+                },
+                {
+                    $match: {
+                        uuid: idUser
+                    }
+                },
+                {
+                    $lookup:
+                    {
+                        from: 'ads',
+                        localField: 'adsId',
+                        foreignField: '_id',
+                        as: 'ads'
+                    }
+                },
+                {
+                    $unwind: '$ads'
+                }
+
+            ]
+        )
+        // const userLatest = await modelUserLog.findOne({ uuid: idUser })
+        return userFind.pop()
+    } catch (e) {
+        errorCatch(e)
+    }
+}
+
 const nextUser = async () => {
     try {
         const userLatest = await modelLead.findOneAndUpdate({}, { updatedAt: Date.now() }, {
@@ -40,4 +75,4 @@ const nextUser = async () => {
     }
 }
 
-module.exports = { registerLog, checkLog, nextUser }
+module.exports = { registerLog, checkLog, nextUser, findLog }

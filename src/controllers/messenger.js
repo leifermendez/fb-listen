@@ -3,12 +3,13 @@ const loginMessenger = require("facebook-chat-api");
 const { puppeterConfig, layout, url } = require('../../config')
 const fs = require('fs')
 const { getAccount } = require('../controllers/accounts')
-const { registerLog } = require('../controllers/userLog')
+const { registerLog, findLog, checkLog } = require('../controllers/userLog')
 const { consoleMessage } = require('../helpers/console')
+
 
 const pathCookieAccount = `${__dirname}/../../tmp`
 
-var credentials, page, browser, userFb, ads;
+var credentials, page, browser, userFb;
 
 
 // Check ✔
@@ -149,18 +150,25 @@ const generateCredentials = () => {
 
 }
 
-const singleSend = (body, userId, adsId) => {
-
+const singleSend = (body, userId, adsId, media, replay = false) => {
     try {
+        var msg;
+        if (media) {
+            msg = {
+                attachment: fs.createReadStream(`${__dirname}/../media/gallery-1.png`)
+            }
+        }
+
         generateCredentials()
         loginMessenger(credentials, (err, api) => {
             if (err) return console.error(err);
-            console.log(body.fb_message, body.fb_uid);
+            if (media) api.sendMessage(msg, body.fb_uid);
             api.sendMessage(body.fb_message, body.fb_uid, async (e, messageInfo) => {
                 if (e) {
+                    console.log(e)
                     consoleMessage('Error en FB Messenger :(', 'red')
                 } else {
-                    await registerLog({ userId, adsId })
+                    if (adsId) await registerLog({ userId, adsId, uuid: body.fb_uid, replay })
                     consoleMessage(`Mensaje enviado! ${body.fb_uid}`, 'green')
                 }
 
@@ -172,5 +180,36 @@ const singleSend = (body, userId, adsId) => {
     }
 }
 
+const listenMessage = () => {
+    try {
+        generateCredentials()
+        loginMessenger(credentials, (err, api) => {
+            if (err) return console.error(err);
+            api.listenMqtt((err, message) => {
+                if (err) return console.error(err);
+                if (message.body !== undefined) {
+                    setTimeout(async () => {
+                        const userTh = message.threadID
+                        const userLog = await findLog(userTh)
+                        api.markAsRead(userTh);
+                        api.sendTypingIndicator(userTh)
+                        const { answer, _id } = userLog.ads || { answer: null, _id: null }
+                        if (answer && !userLog.replay) {
+                            setTimeout(() => {
+                                singleSend({ fb_message: answer, fb_uid: userTh }, userLog.userId, _id, 'gallery-1.png', true)
+                            }, 1500)
+                        }
 
-module.exports = { init, login, closeBrowser, singleSend }
+
+                    }, 4500)
+                }
+            });
+        });
+    } catch (e) {
+        console.log(e);
+        new Error('algo')
+    }
+
+}
+
+module.exports = { init, login, closeBrowser, singleSend, listenMessage }

@@ -9,6 +9,14 @@ const UserLogSchema = new mongoose.Schema(
         adsId: {
             type: mongoose.Types.ObjectId,
             require: true
+        },
+        replay: {
+            type: Boolean,
+            default: false
+        },
+        uuid: {
+            type: String,
+            require: true
         }
     },
     {

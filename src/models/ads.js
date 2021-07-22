@@ -10,6 +10,9 @@ const AdsSchema = new mongoose.Schema(
         },
         attached: {
             type: String
+        },
+        answer: {
+            type: String
         }
     },
     {
