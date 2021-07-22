@@ -6,5 +6,5 @@ userLog.json
 userReplay.json
 log.json
 .env
-tmp/
+tmp/*
 !tmp/.gitkeep
