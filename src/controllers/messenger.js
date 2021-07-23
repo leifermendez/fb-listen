@@ -189,7 +189,8 @@ const listenMessage = () => {
             api.listenMqtt((err, message) => {
                 if (err) return console.error(err);
                 if (message.body !== undefined) {
-                    if (!testMode) {
+                    console.log(testMode)
+                    if (testMode === 'true') {
                         const testUUID = process.env.FB_UID_TEST
                         const testAnswer = process.env.FB_ANSWER || 'answer'
                         singleSend({ fb_message: testAnswer, fb_uid: testUUID }, null, null, 'gallery-1.png', true)

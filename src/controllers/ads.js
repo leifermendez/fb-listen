@@ -21,7 +21,7 @@ const playAds = async (name) => {
         const user = await nextUser()
         const check = await checkLog({ userId: user._id, adsId: resAds._id })
 
-        if (testMode) {
+        if (testMode === 'true') {
             const testMessage = process.env.FB_MESSAGE || 'test message'
             const testUUID = process.env.FB_UID_TEST
             singleSend({ fb_uid: testUUID, fb_message: testMessage }, null, null)
