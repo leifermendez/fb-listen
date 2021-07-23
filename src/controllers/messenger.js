@@ -180,8 +180,9 @@ const singleSend = (body, userId, adsId, media, replay = false) => {
     }
 }
 
-const listenMessage = (testMode = false) => {
+const listenMessage = () => {
     try {
+        const testMode = process.env.TEST_MODE;
         generateCredentials()
         loginMessenger(credentials, (err, api) => {
             if (err) return console.error(err);

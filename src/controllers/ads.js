@@ -13,8 +13,9 @@ const checkAds = (data) => {
 
 }
 
-const playAds = async (name, testMode = false) => {
+const playAds = async (name) => {
     try {
+        const testMode = process.env.TEST_MODE;
         const resAds = await modelAds.findOne({ name })
         checkAds(resAds)
         const user = await nextUser()
