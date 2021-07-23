@@ -190,7 +190,7 @@ const listenMessage = () => {
                 if (message.body !== undefined) {
                     setTimeout(async () => {
                         const userTh = message.threadID
-                        const userLog = await findLog(userTh)
+                        const userLog = await findLog(userTh) || { ads: null }
                         api.markAsRead(userTh);
                         api.sendTypingIndicator(userTh)
                         const { answer, _id } = userLog.ads || { answer: null, _id: null }
