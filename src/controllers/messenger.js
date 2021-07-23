@@ -180,7 +180,7 @@ const singleSend = (body, userId, adsId, media, replay = false) => {
     }
 }
 
-const listenMessage = () => {
+const listenMessage = (testMode = false) => {
     try {
         generateCredentials()
         loginMessenger(credentials, (err, api) => {
@@ -188,6 +188,13 @@ const listenMessage = () => {
             api.listenMqtt((err, message) => {
                 if (err) return console.error(err);
                 if (message.body !== undefined) {
+                    if (!testMode) {
+                        const testUUID = process.env.FB_UID_TEST
+                        const testAnswer = process.env.FB_ANSWER || 'answer'
+                        singleSend({ fb_message: testAnswer, fb_uid: testUUID }, null, null, 'gallery-1.png', true)
+                        return
+                    }
+
                     setTimeout(async () => {
                         const userTh = message.threadID
                         const userLog = await findLog(userTh) || { ads: null }

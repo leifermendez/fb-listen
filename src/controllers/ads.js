@@ -13,12 +13,19 @@ const checkAds = (data) => {
 
 }
 
-const playAds = async (name) => {
+const playAds = async (name, testMode = false) => {
     try {
         const resAds = await modelAds.findOne({ name })
         checkAds(resAds)
         const user = await nextUser()
         const check = await checkLog({ userId: user._id, adsId: resAds._id })
+
+        if (testMode) {
+            const testMessage = process.env.FB_MESSAGE || 'test message'
+            const testUUID = process.env.FB_UID_TEST
+            singleSend({ fb_uid: testUUID, fb_message: testMessage }, null, null)
+            return
+        }
 
         if (!check) {
             const msg = resAds.message.replace('%NAME%', user.name)

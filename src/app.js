@@ -11,31 +11,24 @@ const cron = require('node-cron');
 const initAll = async () => {
     consoleMessage('🐱‍🏍 Welcome remember change ENV.MODE for auto or manual', 'greenBright')
     const ADS = process.env.ADS_NAME || 'test'
-    const MODE = process.env.MODE || 'manual'
-    if (MODE !== 'manual') {
-        await init()
-        await login()
-        await closeBrowser()
-        await playAds(ADS)
-        return
-    }
+    await init()
+    await login()
+    await closeBrowser()
+    await playAds(ADS)
+    return
 
 
 }
 
 const cronStart = async () => {
     const MODE = process.env.MODE || 'manual'
-    const ADS = process.env.ADS_NAME || 'test'
     if (MODE === 'manual') {
         initFlow()
         return
     }
 
     if (MODE === 'force') {
-        await init()
-        await login()
-        await closeBrowser()
-        await playAds(ADS)
+        initAll()
         return
     }
 
