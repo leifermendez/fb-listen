@@ -189,7 +189,6 @@ const listenMessage = () => {
             api.listenMqtt((err, message) => {
                 if (err) return console.error(err);
                 if (message.body !== undefined) {
-                    console.log(testMode)
                     if (testMode === 'true') {
                         const testUUID = process.env.FB_UID_TEST
                         const testAnswer = process.env.FB_ANSWER || 'answer'
@@ -200,6 +199,7 @@ const listenMessage = () => {
                     setTimeout(async () => {
                         const userTh = message.threadID
                         const userLog = await findLog(userTh) || { ads: null }
+                        console.log('_____USERLOG___', userTh, userLog)
                         api.markAsRead(userTh);
                         api.sendTypingIndicator(userTh)
                         const { answer, _id } = userLog.ads || { answer: null, _id: null }
