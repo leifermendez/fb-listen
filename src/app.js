@@ -16,8 +16,6 @@ const initAll = async () => {
     await closeBrowser()
     await playAds(ADS)
     return
-
-
 }
 
 const cronStart = async () => {
