@@ -37,6 +37,5 @@ const cronStart = async () => {
     });
 }
 
-
 cronStart();
 dbConnection();

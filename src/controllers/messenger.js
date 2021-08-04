@@ -5,7 +5,7 @@ const fs = require('fs')
 const { getAccount } = require('../controllers/accounts')
 const { registerLog, findLog, checkLog } = require('../controllers/userLog')
 const { consoleMessage } = require('../helpers/console')
-
+const { sendNoty } = require('../helpers/notification')
 
 const pathCookieAccount = `${__dirname}/../../tmp`
 
@@ -167,6 +167,7 @@ const singleSend = (body, userId, adsId, media, replay = false) => {
                 if (e) {
                     console.log(e)
                     consoleMessage('Error en FB Messenger :(', 'red')
+                    sendNoty({ title: 'Error', message: 'Error en FB Messenger', type: 'error' })
                 } else {
                     if (adsId) await registerLog({ userId, adsId, uuid: body.fb_uid, replay })
                     consoleMessage(`Mensaje enviado! ${body.fb_uid}`, 'green')
