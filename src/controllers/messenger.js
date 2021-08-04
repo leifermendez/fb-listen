@@ -171,6 +171,7 @@ const singleSend = (body, userId, adsId, media, replay = false) => {
                 } else {
                     if (adsId) await registerLog({ userId, adsId, uuid: body.fb_uid, replay })
                     consoleMessage(`Mensaje enviado! ${body.fb_uid}`, 'green')
+                    sendNoty({ title: 'Mensaje enviado 😁', message: `Mensaje enviado! ${body.fb_uid}`, type: 'success' })
                 }
 
             });
