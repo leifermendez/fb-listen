@@ -9,7 +9,6 @@ const sendNoty = async ({ title = '', type = 'error', message = '' }) => {
             `${url}/notification`,
             { title, type, message }
         )
-        console.log(data)
         return data;
     } catch (e) {
         errorCatch(e)
