@@ -8,3 +8,4 @@ log.json
 .env
 tmp/*
 !tmp/.gitkeep
+aws-secret.json

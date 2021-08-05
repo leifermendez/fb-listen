@@ -7,6 +7,7 @@ const { registerLog, findLog } = require('../controllers/userLog')
 const { consoleMessage } = require('../helpers/console')
 const { errorCatch } = require('../helpers/errorHandle')
 const { sendNoty } = require('../helpers/notification')
+const { checkSentiment } = require('../services/comprehend')
 
 const pathCookieAccount = `${__dirname}/../../tmp`
 
@@ -207,6 +208,17 @@ const listenMessage = () => {
                         return
                     }
 
+                    if (process.env.AI === 'true') {
+                        const scoreSentiment = await checkSentiment(message.body)
+                        if (scoreSentiment.Sentiment === 'NEGATIVE') {
+                            errorCatch(message, 'USER_NEGATIVE')
+                            sendNoty({ title: 'Sentimiento', message: `Sentimiento negavito ${message.body}`, type: 'error' })
+                            return
+                        }
+                    }
+
+                    //TODO::
+                    //** Wait 15 seconds for reply */
                     setTimeout(async () => {
                         const userTh = message.threadID
                         const userLog = await findLog(userTh) || { ads: null }
@@ -223,11 +235,10 @@ const listenMessage = () => {
                                     true,
                                     message.body
                                 )
-                            }, 1500)
+                            }, 5500)
                         }
 
-
-                    }, 4500)
+                    }, 15000)
                 }
             });
         });
