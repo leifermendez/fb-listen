@@ -201,6 +201,17 @@ const listenMessage = () => {
             api.listenMqtt(async (err, message) => {
                 if (err) return console.error(err);
                 if (message.body !== undefined) {
+
+                    if (process.env.AI === 'true') {
+                        const scoreSentiment = await checkSentiment(message.body)
+                        if (scoreSentiment.Sentiment === 'NEGATIVE') {
+
+                            errorCatch(message, 'USER_NEGATIVE')
+                            sendNoty({ title: 'Sentimiento', message: `Sentimiento negavito ${message.body}`, type: 'error' })
+                            return
+                        }
+                    }
+
                     if (testMode === 'true') {
                         const testUUID = process.env.FB_UID_TEST
                         const testAnswer = process.env.FB_ANSWER || 'answer'
@@ -208,14 +219,7 @@ const listenMessage = () => {
                         return
                     }
 
-                    if (process.env.AI === 'true') {
-                        const scoreSentiment = await checkSentiment(message.body)
-                        if (scoreSentiment.Sentiment === 'NEGATIVE') {
-                            errorCatch(message, 'USER_NEGATIVE')
-                            sendNoty({ title: 'Sentimiento', message: `Sentimiento negavito ${message.body}`, type: 'error' })
-                            return
-                        }
-                    }
+
 
                     //TODO::
                     //** Wait 15 seconds for reply */
