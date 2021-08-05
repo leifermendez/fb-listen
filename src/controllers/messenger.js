@@ -165,11 +165,10 @@ const singleSend = (body, userId, adsId, media, replay = false) => {
             if (media) api.sendMessage(msg, body.fb_uid);
             api.sendMessage(body.fb_message, body.fb_uid, async (e, messageInfo) => {
                 if (e) {
-                    console.log(e)
                     consoleMessage('Error en FB Messenger :(', 'red')
                     sendNoty({ title: 'Error', message: 'Error en FB Messenger', type: 'error' })
                 } else {
-                    if (adsId) await registerLog({ userId, adsId, uuid: body.fb_uid, replay })
+                    if (adsId) await registerLog({ userId, adsId, uuid: body.fb_uid, replay, userFb: userFb.email })
                     consoleMessage(`Mensaje enviado! ${body.fb_uid}`, 'green')
                     sendNoty({ title: 'Mensaje enviado 😁', message: `Mensaje enviado! ${body.fb_uid}`, type: 'success' })
                 }

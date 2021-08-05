@@ -17,6 +17,9 @@ const UserLogSchema = new mongoose.Schema(
         uuid: {
             type: String,
             require: true
+        },
+        userFb: {
+            type: String
         }
     },
     {
