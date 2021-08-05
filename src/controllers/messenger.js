@@ -3,8 +3,9 @@ const loginMessenger = require("facebook-chat-api");
 const { puppeterConfig, layout, url } = require('../../config')
 const fs = require('fs')
 const { getAccount } = require('../controllers/accounts')
-const { registerLog, findLog, checkLog } = require('../controllers/userLog')
+const { registerLog, findLog } = require('../controllers/userLog')
 const { consoleMessage } = require('../helpers/console')
+const { errorCatch } = require('../helpers/errorHandle')
 const { sendNoty } = require('../helpers/notification')
 
 const pathCookieAccount = `${__dirname}/../../tmp`
@@ -65,7 +66,8 @@ const login = async () => {
             return true
         }
     } catch (e) {
-        new Error('ERROR_UNDEFINED')
+        errorCatch(e, 'MESSENGER_ERROR_LOGIN')
+        new Error('MESSENGER_ERROR_LOGIN')
     }
 
 
@@ -80,7 +82,8 @@ const login = async () => {
         }, acceptCookiesButton);
 
     } catch (e) {
-        new Error('ERROR_WAIT_BANNER_COOKIE')
+        new Error('MESSENGER_ERROR_WAIT_BANNER_COOKIE')
+        errorCatch(e, 'MESSENGER_ERROR_WAIT_BANNER_COOKIE')
         console.log('Error esperando banner cookie');
     }
 
@@ -145,6 +148,7 @@ const generateCredentials = () => {
         }
 
     } catch (e) {
+        errorCatch(e, 'MESSENGER_GENERATE_CREDENTIALS')
         console.log(e);
     }
 
@@ -182,6 +186,7 @@ const singleSend = async (body, userId, adsId, media, replay = false, messageFro
         });
     } catch (e) {
         console.log(e);
+        errorCatch(e, 'MESSENGER_SINGLE_SEND')
         return e
     }
 }
@@ -228,6 +233,7 @@ const listenMessage = () => {
         });
     } catch (e) {
         console.log(e);
+        errorCatch(e, 'MESSENGER_UNDEFINED')
         new Error('algo')
     }
 
