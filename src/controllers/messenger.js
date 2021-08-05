@@ -150,7 +150,7 @@ const generateCredentials = () => {
 
 }
 
-const singleSend = (body, userId, adsId, media, replay = false) => {
+const singleSend = (body, userId, adsId, media, replay = false, messageFromUser = '') => {
     try {
         var msg;
         if (media) {
@@ -168,7 +168,7 @@ const singleSend = (body, userId, adsId, media, replay = false) => {
                     consoleMessage('Error en FB Messenger :(', 'red')
                     sendNoty({ title: 'Error', message: 'Error en FB Messenger', type: 'error' })
                 } else {
-                    if (adsId) await registerLog({ userId, adsId, uuid: body.fb_uid, replay, userFb: userFb.email })
+                    if (adsId) await registerLog({ userId, adsId, uuid: body.fb_uid, replay, userFb: userFb.email, messageFromUser })
                     consoleMessage(`Mensaje enviado! ${body.fb_uid}`, 'green')
                     sendNoty({ title: 'Mensaje enviado 😁', message: `Mensaje enviado! ${body.fb_uid}`, type: 'success' })
                 }
@@ -206,7 +206,13 @@ const listenMessage = () => {
                         const { answer, _id } = userLog.ads || { answer: null, _id: null }
                         if (answer && !userLog.replay) {
                             setTimeout(() => {
-                                singleSend({ fb_message: answer, fb_uid: userTh }, userLog.userId, _id, 'gallery-1.png', true)
+                                singleSend(
+                                    { fb_message: answer, fb_uid: userTh },
+                                    userLog.userId, _id,
+                                    'gallery-1.png',
+                                    true,
+                                    message.body
+                                )
                             }, 1500)
                         }
 

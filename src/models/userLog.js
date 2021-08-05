@@ -20,6 +20,9 @@ const UserLogSchema = new mongoose.Schema(
         },
         userFb: {
             type: String
+        },
+        messageFromUser: {
+            type: String
         }
     },
     {
