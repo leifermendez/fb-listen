@@ -198,7 +198,7 @@ const listenMessage = () => {
         generateCredentials()
         loginMessenger(credentials, (err, api) => {
             if (err) return console.error(err);
-            api.listenMqtt((err, message) => {
+            api.listenMqtt(async (err, message) => {
                 if (err) return console.error(err);
                 if (message.body !== undefined) {
                     if (testMode === 'true') {

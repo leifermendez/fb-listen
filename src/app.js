@@ -38,8 +38,6 @@ const cronStart = async () => {
     });
 }
 
-checkSentiment('hola, si me interesa lo de la programacion, estoy aprendiendo angular12, y tu?').then(a => {
-    console.log('----------->', a)
-})
+
 cronStart();
 dbConnection();
