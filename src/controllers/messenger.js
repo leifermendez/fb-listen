@@ -72,8 +72,8 @@ const login = async () => {
     try {
         consoleMessage('Starting new login', 'yellow')
         await page.goto(url);
-        await page.waitForXPath('//a[@data-cookiebanner="accept_button"]');
-        const acceptCookiesButton = (await page.$x('//a[@data-cookiebanner="accept_button"]'))[0];
+        await page.waitForXPath('//*[@data-cookiebanner="accept_button"]');
+        const acceptCookiesButton = (await page.$x('//*[@data-cookiebanner="accept_button"]'))[0];
         await page.evaluate((el) => {
             el.focus();
             el.click();
@@ -150,13 +150,18 @@ const generateCredentials = () => {
 
 }
 
-const singleSend = (body, userId, adsId, media, replay = false, messageFromUser = '') => {
+const singleSend = async (body, userId, adsId, media, replay = false, messageFromUser = '') => {
     try {
         var msg;
         if (media) {
             msg = {
                 attachment: fs.createReadStream(`${__dirname}/../media/gallery-1.png`)
             }
+        }
+
+        if (process.env.TEST_MODE === 'true') {
+            const testUUID = process.env.FB_UID_TEST
+            await registerLog({ userId, adsId: null, uuid: testUUID, replay, userFb: userFb.email, messageFromUser })
         }
 
         generateCredentials()
@@ -193,7 +198,7 @@ const listenMessage = () => {
                     if (testMode === 'true') {
                         const testUUID = process.env.FB_UID_TEST
                         const testAnswer = process.env.FB_ANSWER || 'answer'
-                        singleSend({ fb_message: testAnswer, fb_uid: testUUID }, null, null, 'gallery-1.png', true)
+                        singleSend({ fb_message: testAnswer, fb_uid: testUUID }, null, null, 'gallery-1.png', true, message.body)
                         return
                     }
 

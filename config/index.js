@@ -1,7 +1,7 @@
 module.exports = {
     url: 'https://m.facebook.com',
     puppeterConfig: {
-        headless: true,
+        headless: false,
         args: [
             '--no-sandbox',
             '--disable-setuid-sendbox',
