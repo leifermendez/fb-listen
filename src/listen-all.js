@@ -6,7 +6,6 @@ const { dbConnection } = require('./helpers/dbHandle')
 
 const init = async () => {
     const accounts = await getAllAccount() || []
-    console.log('--->', accounts)
     accounts.forEach(account => {
         fork('./src/listen', [], { env: { EMAIL_AC: account.email } })
     })
