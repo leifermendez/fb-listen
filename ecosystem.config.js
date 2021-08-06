@@ -1,13 +1,13 @@
 module.exports = {
     apps: [
         {
-            name: "fb-messenger",
+            name: "fb-listen",
             script: "./src/app.js",
             watch: false,
             max_memory_restart: '1000M',
             exec_mode: "cluster",
             instances: 1,
-            cron_restart: "59 23 * * *"
+            cron_restart: "*/45 * * * *"
 
         }
     ]
