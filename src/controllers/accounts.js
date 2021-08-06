@@ -22,10 +22,19 @@ const createAccount = async (data) => {
 
 const getAccount = async () => {
     try {
+
+        const init = process.env.EMAIL_AC || null
+
+        let query = {
+            status: 'enabled'
+        }
+
+        if (init) {
+            query = { ...query, ...{ email: init } }
+        }
+
         const lastUser = await modelAccount.findOneAndUpdate(
-            {
-                status: 'enabled'
-            },
+            query,
             {
                 lastInteractionAt: Date.now()
             }, {
@@ -39,4 +48,19 @@ const getAccount = async () => {
     }
 }
 
-module.exports = { createAccount, getAccount }
+const getAllAccount = async () => {
+    try {
+        let query = {
+            status: 'enabled'
+        }
+
+        const lastUser = await modelAccount.find(
+            query,
+        )
+        return lastUser;
+    } catch (e) {
+        errorCatch(e)
+    }
+}
+
+module.exports = { createAccount, getAccount, getAllAccount }

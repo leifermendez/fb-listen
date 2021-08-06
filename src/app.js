@@ -4,7 +4,7 @@ const { dbConnection } = require('./helpers/dbHandle')
 const { initFlow } = require('./helpers/console')
 const { init, login, closeBrowser } = require('./controllers/messenger')
 const { playAds } = require('./controllers/ads')
-const { checkSentiment } = require('./services/comprehend')
+// const { checkSentiment } = require('./services/comprehend')
 
 const cron = require('node-cron');
 
